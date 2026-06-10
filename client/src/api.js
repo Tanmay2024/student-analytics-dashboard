@@ -1,8 +1,5 @@
 import axios from "axios";
 
 export default axios.create({
-
-  baseURL:
-    "http://localhost:5000/api"
-
+  baseURL: "https://student-analytics-dashboard-fi0m.onrender.com/api"
 });
