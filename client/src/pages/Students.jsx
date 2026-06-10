@@ -8,6 +8,14 @@ function Students() {
     const [department, setDepartment] = useState("All");
     const [loading, setLoading] =
         useState(true);
+    const [showEditModal, setShowEditModal] = useState(false);
+
+    const [editData, setEditData] = useState({
+        _id: "",
+        name: "",
+        department: "",
+        marks: ""
+    });
 
     useEffect(() => {
 
@@ -64,43 +72,42 @@ function Students() {
             }
 
         };
-    const updateStudent = async (student) => {
+    const openEditModal = (student) => {
 
-        const name = prompt(
-            "Enter New Name",
-            student.name
-        );
+        setEditData({
+            _id: student._id,
+            name: student.name,
+            department: student.department,
+            marks: student.marks
+        });
 
-        if (name === null) return;
+        setShowEditModal(true);
 
-        const department = prompt(
-            "Enter Department",
-            student.department
-        );
+    };
 
-        if (department === null) return;
-
-        const marks = prompt(
-            "Enter Marks",
-            student.marks
-        );
-
-        if (marks === null) return;
+    const saveStudent = async () => {
 
         try {
 
             await axios.put(
-                `/students/${student._id}`,
+
+                `/students/${editData._id}`,
+
                 {
-                    name,
-                    department,
-                    marks
+                    name: editData.name,
+                    department: editData.department,
+                    marks: editData.marks
                 }
+
             );
+
+            setShowEditModal(false);
 
             fetchStudents();
 
-        } catch (error) {
+        }
+
+        catch (error) {
 
             console.log(error);
 
@@ -130,15 +137,73 @@ function Students() {
 
     }
 
+    const exportCSV = () => {
+
+        const headers =
+            ["Name", "Department", "Marks"];
+
+        const rows =
+            students.map(student => [
+                student.name,
+                student.department,
+                student.marks
+            ]);
+
+        const csvContent =
+            [headers, ...rows]
+                .map(row => row.join(","))
+                .join("\n");
+
+        const blob =
+            new Blob(
+                [csvContent],
+                {
+                    type: "text/csv"
+                }
+            );
+
+        const url =
+            window.URL.createObjectURL(blob);
+
+        const link =
+            document.createElement("a");
+
+        link.href = url;
+        link.download =
+            "Student_Report.csv";
+
+        link.click();
+
+    };
+
     return (
 
         <div className="page">
 
             <div className="table-card">
 
-                <h1>
-                    Student Performance Center
-                </h1>
+                <div
+                    style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        flexWrap: "wrap",
+                        gap: "15px"
+                    }}
+                >
+
+                    <h1>
+                        Student Performance Center
+                    </h1>
+
+                    <button
+                        className="export-btn"
+                        onClick={exportCSV}
+                    >
+                        📥 Export Report
+                    </button>
+
+                </div>
 
                 <p>
                     Monitor student records,
@@ -365,11 +430,7 @@ function Students() {
 
                                                 <button
                                                     className="action-btn"
-                                                    onClick={() =>
-                                                        updateStudent(
-                                                            student
-                                                        )
-                                                    }
+                                                    onClick={() => openEditModal(student)}
                                                 >
                                                     Edit
                                                 </button>
@@ -399,6 +460,106 @@ function Students() {
                     </tbody>
 
                 </table>
+
+                {
+                    showEditModal && (
+
+                        <div className="modal-overlay">
+
+                            <div className="modal-box">
+
+                                <h2>
+                                    Edit Student
+                                </h2>
+
+                                <input
+                                    type="text"
+                                    value={editData.name}
+                                    onChange={(e) =>
+                                        setEditData({
+                                            ...editData,
+                                            name: e.target.value
+                                        })
+                                    }
+                                />
+
+                                <select
+                                    value={editData.department}
+                                    onChange={(e) =>
+                                        setEditData({
+                                            ...editData,
+                                            department:
+                                                e.target.value
+                                        })
+                                    }
+                                >
+
+                                    <option value="CSE">
+                                        CSE
+                                    </option>
+
+                                    <option value="ECE">
+                                        ECE
+                                    </option>
+
+                                    <option value="EEE">
+                                        EEE
+                                    </option>
+
+                                    <option value="IT">
+                                        IT
+                                    </option>
+
+                                    <option value="AI&DS">
+                                        AI&DS
+                                    </option>
+
+                                </select>
+
+                                <input
+                                    type="number"
+                                    value={editData.marks}
+                                    onChange={(e) =>
+                                        setEditData({
+                                            ...editData,
+                                            marks:
+                                                e.target.value
+                                        })
+                                    }
+                                />
+
+                                <div
+                                    style={{
+                                        display: "flex",
+                                        gap: "10px"
+                                    }}
+                                >
+
+                                    <button
+                                        className="primary-btn"
+                                        onClick={saveStudent}
+                                    >
+                                        Save Changes
+                                    </button>
+
+                                    <button
+    className="action-btn delete-btn"
+    onClick={() =>
+        setShowEditModal(false)
+    }
+>
+    Cancel
+</button>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    )
+
+                }
 
             </div>
 

@@ -373,3 +373,45 @@ select:focus{
   background:#06b6d4;
   color:white;
 }
+
+.export-btn{
+  background:linear-gradient(
+    135deg,
+    #10b981,
+    #059669
+  );
+
+  color:white;
+  border:none;
+  padding:12px 20px;
+  border-radius:12px;
+  font-weight:600;
+  cursor:pointer;
+  transition:0.3s;
+}
+
+.export-btn:hover{
+  transform:translateY(-3px);
+}
+
+.modal-overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.7);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  z-index:1000;
+}
+
+.modal-box{
+  width:450px;
+  background:#1e293b;
+  border:1px solid #334155;
+  border-radius:20px;
+  padding:30px;
+}
+
+.modal-box h2{
+  margin-bottom:20px;
+}
